@@ -54,11 +54,13 @@ class Timer
 private:
     std::vector<stoppedTimer> times;
 
-    Timer();
     void add_times(stoppedTimer new_time);
     std::string summarize();
 
     friend PerfTimer;
+
+public:
+    Timer();
 };
 
 /**
