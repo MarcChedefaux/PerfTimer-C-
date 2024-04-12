@@ -11,6 +11,7 @@
 
 #include <chrono>
 #include <string>
+#include <sstream>
 #include <map>
 #include <vector>
 #include <iostream>
@@ -38,7 +39,7 @@ private:
 struct stoppedTimer
 {
 private:
-    int elapsed_time;
+    std::chrono::duration<int64_t, std::nano> elapsed_time;
 
     friend Timer;
     friend PerfTimer;
@@ -67,8 +68,12 @@ private:
 class PerfTimer
 {
 private:
-    static std::map<int, Timer> all_timers;
+    static std::map<std::string, Timer> all_timers;
 
 public:
     PerfTimer() = delete;
+
+    static runningTimer start_timer(std::string timer_name);
+    static void stop_timer(runningTimer start_timer);
+    static std::string summarize();
 };
