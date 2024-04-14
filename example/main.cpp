@@ -6,9 +6,11 @@ void test_thread(std::string timer_name, int usleep_count)
 {
     for (int i = 0; i < 100; i++)
     {
+        auto timer_above = PerfTimer::start_timer(timer_name + "_encapsulating");
         auto timer = PerfTimer::start_timer(timer_name);
         std::this_thread::sleep_for(std::chrono::microseconds(usleep_count));
         PerfTimer::stop_timer(timer);
+        PerfTimer::stop_timer(timer_above);
     }
 }
 
