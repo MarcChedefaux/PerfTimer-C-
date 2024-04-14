@@ -24,35 +24,45 @@ void Timer::add_times(stoppedTimer new_time)
 
 std::string Timer::summarize()
 {
+    auto stats = get_statistics();
+    double var = 0;
+    for (auto timer : times)
+    {
+        int64_t time = std::chrono::nanoseconds(timer.elapsed_time).count();
+        var += ((double)time - stats.mean) * ((double)time - stats.mean) / (double)stats.number;
+    }
+    double sd = sqrt(var);
+
+    std::stringstream ss;
+    if (stats.mean < 1e3)
+    {
+        ss << std::fixed << std::setprecision(4) << stats.mean << " ns (+- " << std::fixed << std::setprecision(4) << sd << " ns) ";
+    }
+    else if (stats.mean < 1e6)
+    {
+        ss << std::fixed << std::setprecision(4) << stats.mean / 1e3 << " µs (+- " << std::fixed << std::setprecision(4) << sd / 1e3 << " µs) ";
+    }
+    else
+    {
+        ss << std::fixed << std::setprecision(4) << stats.mean / 1e6 << " ms (+- " << std::fixed << std::setprecision(4) << sd / 1e6 << " ms) ";
+    }
+    ss << "over " << stats.number << " runs";
+    return ss.str();
+}
+
+statistics Timer::get_statistics()
+{
     double mean = 0;
     long long number_times = times.size();
     for (auto timer : times)
     {
         mean += (double)std::chrono::nanoseconds(timer.elapsed_time).count() / (double)number_times;
     }
-    double var = 0;
-    for (auto timer : times)
-    {
-        int64_t time = std::chrono::nanoseconds(timer.elapsed_time).count();
-        var += ((double)time - mean) * ((double)time - mean) / (double)number_times;
-    }
-    double sd = sqrt(var);
+    statistics stats;
+    stats.mean = mean;
+    stats.number = number_times;
 
-    std::stringstream ss;
-    if (mean < 1e3)
-    {
-        ss << std::fixed << std::setprecision(4) << mean << " ns (+- " << std::fixed << std::setprecision(4) << sd << " ns) ";
-    }
-    else if (mean < 1e6)
-    {
-        ss << std::fixed << std::setprecision(4) << mean / 1e3 << " µs (+- " << std::fixed << std::setprecision(4) << sd / 1e3 << " µs) ";
-    }
-    else
-    {
-        ss << std::fixed << std::setprecision(4) << mean / 1e6 << " ms (+- " << std::fixed << std::setprecision(4) << sd / 1e6 << " ms) ";
-    }
-    ss << "over " << number_times << " runs";
-    return ss.str();
+    return stats;
 }
 
 // PerfTimer class implementation
@@ -79,11 +89,35 @@ std::string PerfTimer::summarize()
     std::stringstream ss;
     for (auto &timer : all_timers)
     {
+        std::vector<statistics> all_stats;
+        long long all_runs = 0;
         ss << KBLU << BOLD << timer.first << " : " << RST << std::endl;
         for (auto &t : timer.second)
         {
             ss << "\t" << KGRN << UNDL << t.first << " :" << RST << " " << t.second.summarize() << std::endl;
+            auto stat = t.second.get_statistics();
+            all_runs += stat.number;
+            all_stats.push_back(stat);
         }
+        double all_mean = 0;
+        for (auto stat : all_stats)
+        {
+            all_mean += stat.mean * ((double)(stat.number) / (double)(all_runs));
+        }
+        ss << "\t" << KMAG << BOLD << "Average : ";
+        if (all_mean < 1e3)
+        {
+            ss << std::fixed << std::setprecision(4) << all_mean << " ns";
+        }
+        else if (all_mean < 1e6)
+        {
+            ss << std::fixed << std::setprecision(4) << all_mean / 1e3 << " µs";
+        }
+        else
+        {
+            ss << std::fixed << std::setprecision(4) << all_mean / 1e6 << " ms";
+        }
+        ss << " over " << all_runs << " runs" << RST << std::endl;
     }
     return ss.str();
 }

@@ -69,6 +69,16 @@ private:
     friend PerfTimer;
 };
 
+struct statistics
+{
+private:
+    double mean;
+    long long number;
+
+    friend Timer;
+    friend PerfTimer;
+};
+
 /**
  * @brief Class instantiating an instance of a timer containing all the runs of a specific part of the execution
  *
@@ -80,6 +90,7 @@ private:
 
     void add_times(stoppedTimer new_time);
     std::string summarize();
+    statistics get_statistics();
 
     friend PerfTimer;
 
