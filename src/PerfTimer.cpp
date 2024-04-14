@@ -41,15 +41,15 @@ std::string Timer::summarize()
     std::stringstream ss;
     if (mean < 1e3)
     {
-        ss << mean << " ns (+- " << sd << " ns) ";
+        ss << std::fixed << std::setprecision(4) << mean << " ns (+- " << std::fixed << std::setprecision(4) << sd << " ns) ";
     }
     else if (mean < 1e6)
     {
-        ss << mean / 1e3 << " µs (+- " << sd / 1e3 << " µs) ";
+        ss << std::fixed << std::setprecision(4) << mean / 1e3 << " µs (+- " << std::fixed << std::setprecision(4) << sd / 1e3 << " µs) ";
     }
     else
     {
-        ss << mean / 1e6 << " ms (+- " << sd / 1e6 << " ms) ";
+        ss << std::fixed << std::setprecision(4) << mean / 1e6 << " ms (+- " << std::fixed << std::setprecision(4) << sd / 1e6 << " ms) ";
     }
     ss << "over " << number_times << " runs";
     return ss.str();
