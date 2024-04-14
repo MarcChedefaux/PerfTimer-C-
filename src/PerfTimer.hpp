@@ -69,6 +69,10 @@ private:
     friend PerfTimer;
 };
 
+/**
+ * @brief Struct containing informations about the statistics of multiple timers
+ *
+ */
 struct statistics
 {
 private:
@@ -88,8 +92,25 @@ class Timer
 private:
     std::vector<stoppedTimer> times;
 
+    /**
+     * @brief Add a new stoppedTimer to the vector of timers
+     *
+     * @param new_time
+     */
     void add_times(stoppedTimer new_time);
+
+    /**
+     * @brief Summarize the vector timers
+     *
+     * @return std::string
+     */
     std::string summarize();
+
+    /**
+     * @brief Calculate and get the statistics of the vector of timers
+     *
+     * @return statistics
+     */
     statistics get_statistics();
 
     friend PerfTimer;
@@ -110,8 +131,26 @@ private:
 public:
     PerfTimer() = delete;
 
+    /**
+     * @brief Start a new timer
+     *
+     * @param timer_name
+     * @return runningTimer
+     */
     static runningTimer start_timer(std::string timer_name);
+
+    /**
+     * @brief Stop a timer
+     *
+     * @param start_timer
+     */
     static void stop_timer(runningTimer start_timer);
+
+    /**
+     * @brief Summarize all the timers
+     *
+     * @return std::string
+     */
     static std::string summarize();
 };
 
